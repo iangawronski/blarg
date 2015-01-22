@@ -3,7 +3,7 @@ require 'pry'
 require 'camping'
 
 # NOTE: BLOG_REPO has to end with a slash/.
-BLOG_REPO = '/Users/brit/projects/improvedmeans/'
+BLOG_REPO = '/Users/iangawronski1/blarg/improvedmeans/'
 
 Camping.goes :Blarg
 
@@ -190,6 +190,34 @@ end
 def Blarg.create
   Blarg::Models.create_schema
 end
+
+  def top_tags
+    most_used_tags = {}
+      Blarg::Models::Post.find_each do |post|
+        post.tags.each do |s|
+          if most_used_tags.has_key?(s)
+            most_used_tags[s] += 1
+          else
+            most_used_tags[s] = 1
+          end
+        end
+      ten_most_popular_tags = most_used_tags.sort_by { |key, value| value }.reverse # Can put in -value and won't the dot reverse at all
+      puts ten_most_popular_tags.first(10)
+    end
+  end
+
+def top_months(n)
+  sqlite_month = "strftime('%m', date)"
+  grouped = Blarg::Models::Post.select(sqlite_month).group(sqlite_month)
+    # Relations --> does not ask the database for something. Used whe you want to build up queries in pieces sometimes. Can be built up over multiple method calls and will be initiated by the "kicker"
+  ordered = grouped.order('count_id desc').count('id')
+  ordered.first(n).each do |m, posts|
+    puts "Blogged #{posts} times in #{m}"
+  end
+end
+
+
+
 
 #blog = BlogApp.new
 #blog.run
